@@ -1,0 +1,14 @@
+.container {
+  width: 100%;
+  height: 100%;
+}
+
+.cellContainer {
+  display: inline;
+}
+.cell {
+  display: inline-block;
+  width: 15px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
