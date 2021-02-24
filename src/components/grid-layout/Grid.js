@@ -1,4 +1,5 @@
 import React from "react"
+import styles from "./gridLayout.module.css"
 
 const Grid = () => {
     const grid = [
@@ -11,8 +12,8 @@ const Grid = () => {
 
 
     const getLayout = () => {
-        //const result = grid[0].map((item) => <span>{` ${item.toUpperCase()} `}</span>)
-        const result = grid.map((row) => row.map((item, i) => <><div style={{ display: "inline-block", width: "15px", paddingLeft: "5px", paddingRight: "5px", }}>{`${item.toUpperCase()}`}</div>{i === row.length - 1 ? <br /> : ""}</>))
+        //Refactor this
+        const result = grid.map((row) => row.map((item, i) => <><div className={styles.cell}>{`${item.toUpperCase()}`}</div>{i === row.length - 1 ? <br /> : ""}</>))
 
         return result;
     }

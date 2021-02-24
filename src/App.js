@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import { Grid } from "./components/Grid"
+import { Grid } from "./components/grid-layout/Grid"
 
 function App() {
 
