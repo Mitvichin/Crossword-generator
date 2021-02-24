@@ -1,7 +1,7 @@
 import React from "react"
-import styles from "./gridLayout.module.css"
+import styles from "./crosswordLayout.module.css"
 
-const Grid = () => {
+const CrosswordLayout = () => {
     const grid = [
         ['r', 'o', 'o', 'm'],
         ['a', '', '', 'o'],
@@ -26,4 +26,4 @@ const Grid = () => {
     </div>
 }
 
-export { Grid }
+export { CrosswordLayout }
