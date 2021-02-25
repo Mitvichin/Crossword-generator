@@ -1,6 +1,6 @@
 import React from 'react';
 import { CrosswordLayout } from './crossword_layout/CrosswordLayout';
-import { CrosswordFactory } from './crossrword_generator/CrosswordFactory';
+import { CrosswordFactory } from './crossrword_factory/CrosswordFactory';
 
 const Crossword = () => {
   const words = ['room', 'rat', 'mouse'];
