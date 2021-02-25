@@ -1,20 +1,15 @@
-import React from 'react';
+import React, { useEffect,useState } from 'react';
 import { CrosswordLayout } from './crossword_layout/CrosswordLayout';
 import { CrosswordFactory } from './crossrword_factory/CrosswordFactory';
+const words = ['room', 'rat', 'mouse'];
 
 const Crossword = () => {
-  const words = ['room', 'rat', 'mouse'];
+  const [grid, setGrid] = useState([]);
 
-  const newWords = CrosswordFactory(words);
-
-  console.log(newWords.grid);
-  const grid = [
-    ['r', 'o', 'o', 'm'],
-    ['a', '', '', 'o'],
-    ['t', '', '', 'u'],
-    ['', '', '', 's'],
-    ['', '', '', 'e']
-  ];
+  useEffect(() => {
+    const newWords = CrosswordFactory(words);
+    setGrid(newWords.grid);
+  }, []);
 
   return <CrosswordLayout grid={grid} />;
 };
