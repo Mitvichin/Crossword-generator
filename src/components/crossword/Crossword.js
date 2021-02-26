@@ -1,7 +1,7 @@
-import React, { useEffect,useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CrosswordLayout } from './crossword_layout/CrosswordLayout';
 import { CrosswordFactory } from './crossrword_factory/CrosswordFactory';
-const words = ['room', 'rat', 'mouse'];
+const words = ['programming', 'biking'];
 
 const Crossword = () => {
   const [grid, setGrid] = useState([]);

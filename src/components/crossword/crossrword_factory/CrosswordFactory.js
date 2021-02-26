@@ -8,15 +8,31 @@ function CrosswordFactory(words) {
     isVertical: false,
     startingCordinates: { x: 0, y: 0 }
   }));
-  const gridSize = Math.floor(wordInfos[0].text.length + 3);
-  let grid = generateGrid(gridSize, defaultEmptyCellValue);
+  const gridSize = Math.floor(wordInfos[0].text.length * 1.5);
+  let grid = generateGrid(17, defaultEmptyCellValue);
+
+  const createCrosswordGrid = () => {
+    wordInfos.forEach((wordInfo, i) => {
+      const isWordPlaced = tryPlacingWord(wordInfo, placedWords, grid);
+      if (isWordPlaced) {
+        placedWords = moveWordToPlaced(i, wordInfos, placedWords);
+      }
+    });
+  };
 
   grid = placeFirstWord(wordInfos[0], grid);
-  const result = moveWordToPlaced(0, wordInfos, placedWords);
-  placedWords = result.placedWords;
-  wordInfos = result.wordInfos;
-  tryPlacingWord(wordInfos[0], placedWords, grid);
-  console.log(wordInfos[0]);
+  placedWords = moveWordToPlaced(0, wordInfos, placedWords);
+  wordInfos.shift();
+
+  for (let i = 0; i < 3; i++) {
+    createCrosswordGrid();
+    wordInfos = wordInfos.filter((info) =>
+      placedWords.find((placedInfo) => placedInfo.text === info.text) ? false : true
+    );
+    if (wordInfos.length === 0) break;
+  }
+
+  console.log(wordInfos);
 
   return {
     words: wordInfos,
@@ -25,78 +41,90 @@ function CrosswordFactory(words) {
 }
 
 const tryPlacingWord = (wordInfo, placedWords, grid) => {
-  const { isPlacedWordVertical, placedCharInfos } = getPosibleIntersectionsForWord(
-    wordInfo,
-    placedWords
-  );
+  const potentialIntersectionInfos = getPosibleIntersectionsForWord(wordInfo, placedWords);
+  const { text } = wordInfo;
 
-  const { isVertical, text } = wordInfo;
-
-  if (placedCharInfos.length > 0) {
-    for (let i = 0; i < placedCharInfos.length; i++) {
-      const indexOfCrossChar = wordInfo.text.indexOf(placedCharInfos[i].char);
+  if (potentialIntersectionInfos.length > 0) {
+    for (let i = 0; i < potentialIntersectionInfos.length; i++) {
+      const { isPlacedWordVertical, char, placedX, placedY } = potentialIntersectionInfos[i];
+      wordInfo.isVertical = !isPlacedWordVertical;
+      const { isVertical } = wordInfo;
+      const indexOfCrossChar = wordInfo.text.indexOf(char);
       let x = 0;
       let y = 0;
+
       //calculating potential start of cordinates
       if (isVertical) {
-        x = placedCharInfos[i].x - indexOfCrossChar;
-        y = placedCharInfos[i].y;
+        x = placedX - indexOfCrossChar;
+        y = placedY;
       } else {
-        x = placedCharInfos[i].x;
-        y = placedCharInfos[i].y - indexOfCrossChar;
+        x = placedX;
+        y = placedY - indexOfCrossChar;
       }
 
       wordInfo.startingCordinates.x = x;
       wordInfo.startingCordinates.y = y;
 
-      const isWordLegal = true;
+      let isWordIllegal = false;
+      console.log(grid);
+      //for (let i = 0; i < wordInfo.text.length; i++) {
+      [...text].forEach((char, i) => {
+        const currentX = isVertical ? x + i : x;
+        const currentY = isVertical ? y : y + i;
+        
+        const isCellLegal =
+          (doesCellExist(currentX, currentY, grid) && char === grid[currentX][currentY]) ||
+          isEmptyCell(currentX, currentY, grid);
 
-      for (let i = 0; i < wordInfo.text.length; i++) {
-        // you are not passing the correct cordinates for the current char
-        if (
-          (!isEmptyCell(x, y, grid) || text[i] !== grid[x][y]) &&
-          checkIfCharIsIllegalForCell(wordInfo, grid)
-        ) {
-          isWordLegal = false;
+        if (isCellLegal) {
+          if (checkIfCharIsIllegalForCell(currentX, currentY, wordInfo, grid)) {
+            isWordIllegal = true;
+          }
+        } else {
+          isWordIllegal = true;
         }
 
-        if (isWordLegal === false) break;
+        if (isWordIllegal === true) return;
+      });
+
+      //}
+
+      if (isWordIllegal === false) {
+        grid = placeWord(wordInfo, grid);
+        return true;
       }
-
-      if (isWordLegal) grid = placeWord(wordInfo, grid);
-
-      return;
     }
+    return true;
   }
 };
 
 const getPosibleIntersectionsForWord = (wordInfo, placedWords) => {
   const wordChars = [...wordInfo.text];
-  const potentialIntersectionInfo = { isPlacedWordVertical: false, placedCharInfos: [] };
+  const potentialIntersectionInfos = [];
 
-  wordChars.forEach((char) => {
-    placedWords.forEach((placedWord) => {
-      const { isVertical, startingCordinates } = placedWord;
-
-      if (wordInfo.isVertical === isVertical) return;
-
-      potentialIntersectionInfo.isPlacedWordVertical = isVertical;
+  placedWords.forEach((placedWord) => {
+    const { isVertical, startingCordinates } = placedWord;
+    wordChars.forEach((char) => {
       const startX = startingCordinates.x;
       const startY = startingCordinates.y;
 
-      [...placedWord.text].forEach((placedChar, i) => {
+      [...placedWord.text].forEach((placedChar, k) => {
         if (placedChar === char) {
           const cordinates = {
-            x: isVertical ? startX + i : startX,
-            y: isVertical ? startY : startY + i
+            placedX: isVertical ? startX + k : startX,
+            placedY: isVertical ? startY : startY + k
           };
-          potentialIntersectionInfo.placedCharInfos.push({ char, ...cordinates });
+          potentialIntersectionInfos.push({
+            isPlacedWordVertical: isVertical,
+            char,
+            ...cordinates
+          });
         }
       });
     });
   });
 
-  return potentialIntersectionInfo;
+  return potentialIntersectionInfos;
 };
 
 const generateGrid = (size, defaultEmptyCell) => {
@@ -110,9 +138,14 @@ const placeFirstWord = (wordInfo, grid) => {
   wordInfo.isVertical = Math.random() > 0.5 ? true : false;
   const halfOfGridSize = Math.floor(grid.length / 2);
   const { isVertical } = wordInfo;
+  // wordInfo.startingCordinates = {
+  //   x: isVertical ? 0 : halfOfGridSize,
+  //   y: isVertical ? halfOfGridSize : 0
+  // };
+  wordInfo.isVertical = true;
   wordInfo.startingCordinates = {
-    x: isVertical ? 0 : halfOfGridSize,
-    y: isVertical ? halfOfGridSize : 0
+    x: 0,
+    y: grid.length - 1
   };
 
   let _grid = placeWord(wordInfo, grid);
@@ -142,11 +175,10 @@ const moveWordToPlaced = (index, wordInfos, placedWords) => {
   const placedWord = _wordInfos.splice(index, 1)[0];
   _placedWords.push(placedWord);
 
-  return { wordInfos: _wordInfos, placedWords: _placedWords };
+  return _placedWords;
 };
 
 const checkIfCharIsIllegalForCell = (x, y, wordInfo, grid) => {
-  const { x, y } = wordInfo.startingCordinates;
   let isIllegal = false;
   if (wordInfo.isVertical) {
     isIllegal =
@@ -200,8 +232,8 @@ const checkIfVerticalCellHasNeighbours = (x, y, word, grid) => {
 
 const checkIfHorizontalCellIsBlocked = (x, y, grid) => {
   const isCellBelowPopulated = !isEmptyCell(x + 1, y, grid);
-  const isRightCellPopulated = !isEmptyCell(x, y + 1, grid);
   const isAboveCellPopulated = !isEmptyCell(x - 1, y, grid);
+  const isRightCellPopulated = y < grid[0].length - 1 && !isEmptyCell(x, y + 1, grid);
 
   return (
     (isCellBelowPopulated && isRightCellPopulated) || (isAboveCellPopulated && isRightCellPopulated)
@@ -210,7 +242,7 @@ const checkIfHorizontalCellIsBlocked = (x, y, grid) => {
 
 const checkIfOverridingHorizontalWord = (x, y, grid) => {
   const isCurrentCellPopulated = !isEmptyCell(x, y, grid);
-  const isRightCellPopulated = !isEmptyCell(x, y + 1, grid);
+  const isRightCellPopulated = y < grid[0].length - 1 && !isEmptyCell(x, y + 1, grid);
 
   return isCurrentCellPopulated && isRightCellPopulated;
 };
@@ -219,7 +251,7 @@ const checkIfHorizontalCellHasNeighbours = (x, y, word, grid) => {
   const isCurrentCellEmpty = isEmptyCell(x, y, grid);
   const isBelowCellPopulated = !isEmptyCell(x + 1, y, grid);
   const isAboveCellPopulated = !isEmptyCell(x - 1, y, grid);
-  const isRightCellPopulated = !isEmptyCell(x, y + 1, grid);
+  const isRightCellPopulated = y < grid[0].length - 1 && !isEmptyCell(x, y + 1, grid);
   const isEndOfWord = isCellEndOfWord(x, y, word);
 
   const hasNeighbours =
@@ -235,6 +267,14 @@ const isEmptyCell = (x, y, grid) => {
 
   return grid[x][y] === defaultEmptyCellValue;
 };
+
+const doesCellExist = (x, y, grid) => {
+  const isXInBorders = x <= grid.length - 1 && x > 0;
+  const isYInBorders = y <= grid[1].length - 1 && y > 0;
+
+  return isXInBorders && isYInBorders;
+};
+
 
 const isCellEndOfWord = (x, y, wordInfo) => {
   const wordCharCount = wordInfo.text.length - 1;
