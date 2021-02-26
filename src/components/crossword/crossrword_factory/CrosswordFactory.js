@@ -9,7 +9,7 @@ function CrosswordFactory(words) {
     startingCordinates: { x: 0, y: 0 }
   }));
   const gridSize = Math.floor(wordInfos[0].text.length * 1.5);
-  let grid = generateGrid(17, defaultEmptyCellValue);
+  let grid = generateGrid(gridSize, defaultEmptyCellValue);
 
   const createCrosswordGrid = () => {
     wordInfos.forEach((wordInfo, i) => {
@@ -26,9 +26,7 @@ function CrosswordFactory(words) {
 
   for (let i = 0; i < 3; i++) {
     createCrosswordGrid();
-    wordInfos = wordInfos.filter((info) =>
-      placedWords.find((placedInfo) => placedInfo.text === info.text) ? false : true
-    );
+    wordInfos = filterWordInfos(wordInfos, placedWords);
     if (wordInfos.length === 0) break;
   }
 
@@ -40,9 +38,17 @@ function CrosswordFactory(words) {
   };
 }
 
+const filterWordInfos = (wordInfos, placedWords) => {
+  return wordInfos.filter(function (info) {
+    return placedWords.find((placedInfo) => placedInfo.text === info.text) ? false : true;
+  });
+};
+
 const tryPlacingWord = (wordInfo, placedWords, grid) => {
   const potentialIntersectionInfos = getPosibleIntersectionsForWord(wordInfo, placedWords);
   const { text } = wordInfo;
+
+  if (text === 'world') debugger;
 
   if (potentialIntersectionInfos.length > 0) {
     for (let i = 0; i < potentialIntersectionInfos.length; i++) {
@@ -67,13 +73,12 @@ const tryPlacingWord = (wordInfo, placedWords, grid) => {
 
       let isWordIllegal = false;
       console.log(grid);
-      //for (let i = 0; i < wordInfo.text.length; i++) {
-      [...text].forEach((char, i) => {
+      for (let i = 0; i < wordInfo.text.length; i++) {
         const currentX = isVertical ? x + i : x;
         const currentY = isVertical ? y : y + i;
-        
+
         const isCellLegal =
-          (doesCellExist(currentX, currentY, grid) && char === grid[currentX][currentY]) ||
+          (doesCellExist(currentX, currentY, grid) && text[i] === grid[currentX][currentY]) ||
           isEmptyCell(currentX, currentY, grid);
 
         if (isCellLegal) {
@@ -84,10 +89,8 @@ const tryPlacingWord = (wordInfo, placedWords, grid) => {
           isWordIllegal = true;
         }
 
-        if (isWordIllegal === true) return;
-      });
-
-      //}
+        if (isWordIllegal === true) break;
+      }
 
       if (isWordIllegal === false) {
         grid = placeWord(wordInfo, grid);
@@ -138,14 +141,9 @@ const placeFirstWord = (wordInfo, grid) => {
   wordInfo.isVertical = Math.random() > 0.5 ? true : false;
   const halfOfGridSize = Math.floor(grid.length / 2);
   const { isVertical } = wordInfo;
-  // wordInfo.startingCordinates = {
-  //   x: isVertical ? 0 : halfOfGridSize,
-  //   y: isVertical ? halfOfGridSize : 0
-  // };
-  wordInfo.isVertical = true;
   wordInfo.startingCordinates = {
-    x: 0,
-    y: grid.length - 1
+    x: isVertical ? 0 : halfOfGridSize,
+    y: isVertical ? halfOfGridSize : 0
   };
 
   let _grid = placeWord(wordInfo, grid);
@@ -197,9 +195,9 @@ const checkIfCharIsIllegalForCell = (x, y, wordInfo, grid) => {
 
 //Vertical Check Functions
 const checkIfVerticalCellIsBlocked = (x, y, grid) => {
-  const isCellBelowPopulated = !isEmptyCell(x + 1, y, grid);
-  const isLeftCellPopulated = !isEmptyCell(x, y - 1, grid);
-  const isRightCellPopulated = !isEmptyCell(x, y + 1, grid);
+  const isCellBelowPopulated = x < grid.length - 1 && !isEmptyCell(x + 1, y, grid); // checking if cell is not at the last row and if populated
+  const isLeftCellPopulated = y > 0 && !isEmptyCell(x, y - 1, grid); // checking if cell is not at the first column and if populated
+  const isRightCellPopulated = y < grid[0].length - 1 && !isEmptyCell(x, y + 1, grid); // checking if cell is not at the last column and if populated
 
   return (
     (isCellBelowPopulated && isLeftCellPopulated) || (isCellBelowPopulated && isRightCellPopulated)
@@ -208,16 +206,16 @@ const checkIfVerticalCellIsBlocked = (x, y, grid) => {
 
 const checkIfOverridingVerticalWord = (x, y, grid) => {
   const isCurrentCellPopulated = !isEmptyCell(x, y, grid);
-  const isAboveCellPopulated = !isEmptyCell(x - 1, y, grid);
+  const isAboveCellPopulated = x > 0 && !isEmptyCell(x - 1, y, grid); // checking if cell is not at the first row and if populated
 
   return isCurrentCellPopulated && isAboveCellPopulated;
 };
 
 const checkIfVerticalCellHasNeighbours = (x, y, word, grid) => {
   const isCurrentCellEmpty = isEmptyCell(x, y, grid);
-  const isBelowCellPopulated = !isEmptyCell(x + 1, y, grid);
-  const isLeftCellPopulated = !isEmptyCell(x, y - 1, grid);
-  const isRightCellPopulated = !isEmptyCell(x, y + 1, grid);
+  const isBelowCellPopulated = x < grid.length - 1 && !isEmptyCell(x + 1, y, grid); // checking if cell is not at the last row and if populated
+  const isLeftCellPopulated = y > 0 && !isEmptyCell(x, y - 1, grid); // checking if cell is not at the first column and if populated
+  const isRightCellPopulated = y < grid[0].length - 1 && !isEmptyCell(x, y + 1, grid); // checking if cell is not at the last column and if populated
   const isEndOfWord = isCellEndOfWord(x, y, word);
 
   const hasNeighbours =
@@ -231,9 +229,9 @@ const checkIfVerticalCellHasNeighbours = (x, y, word, grid) => {
 //Horizontal Check Functions
 
 const checkIfHorizontalCellIsBlocked = (x, y, grid) => {
-  const isCellBelowPopulated = !isEmptyCell(x + 1, y, grid);
-  const isAboveCellPopulated = !isEmptyCell(x - 1, y, grid);
-  const isRightCellPopulated = y < grid[0].length - 1 && !isEmptyCell(x, y + 1, grid);
+  const isCellBelowPopulated = x < grid.length - 1 && !isEmptyCell(x + 1, y, grid); // checking if cell is not at the last row and if populated
+  const isAboveCellPopulated = x > 0 && !isEmptyCell(x - 1, y, grid); // checking if cell is not at the first row and if populated
+  const isRightCellPopulated = y < grid[0].length - 1 && !isEmptyCell(x, y + 1, grid); // checking if cell is not at the last column and if populated
 
   return (
     (isCellBelowPopulated && isRightCellPopulated) || (isAboveCellPopulated && isRightCellPopulated)
@@ -242,16 +240,16 @@ const checkIfHorizontalCellIsBlocked = (x, y, grid) => {
 
 const checkIfOverridingHorizontalWord = (x, y, grid) => {
   const isCurrentCellPopulated = !isEmptyCell(x, y, grid);
-  const isRightCellPopulated = y < grid[0].length - 1 && !isEmptyCell(x, y + 1, grid);
+  const isRightCellPopulated = y < grid[0].length - 1 && !isEmptyCell(x, y + 1, grid); // checking if cell is not at the last column and if populated
 
   return isCurrentCellPopulated && isRightCellPopulated;
 };
 
 const checkIfHorizontalCellHasNeighbours = (x, y, word, grid) => {
   const isCurrentCellEmpty = isEmptyCell(x, y, grid);
-  const isBelowCellPopulated = !isEmptyCell(x + 1, y, grid);
-  const isAboveCellPopulated = !isEmptyCell(x - 1, y, grid);
-  const isRightCellPopulated = y < grid[0].length - 1 && !isEmptyCell(x, y + 1, grid);
+  const isBelowCellPopulated = x < grid.length - 1 && !isEmptyCell(x + 1, y, grid); // checking if cell is not at the last row and if populated
+  const isAboveCellPopulated = x > 0 && !isEmptyCell(x - 1, y, grid); // checking if cell is not at the first row and if populated
+  const isRightCellPopulated = y < grid[0].length - 1 && !isEmptyCell(x, y + 1, grid); // checking if cell is not at the last column and if populated
   const isEndOfWord = isCellEndOfWord(x, y, word);
 
   const hasNeighbours =
@@ -269,12 +267,11 @@ const isEmptyCell = (x, y, grid) => {
 };
 
 const doesCellExist = (x, y, grid) => {
-  const isXInBorders = x <= grid.length - 1 && x > 0;
-  const isYInBorders = y <= grid[1].length - 1 && y > 0;
+  const isXInBorders = x <= grid.length - 1 && x >= 0;
+  const isYInBorders = y <= grid[1].length - 1 && y >= 0;
 
   return isXInBorders && isYInBorders;
 };
-
 
 const isCellEndOfWord = (x, y, wordInfo) => {
   const wordCharCount = wordInfo.text.length - 1;
