@@ -24,9 +24,10 @@ function CrosswordFactory(words) {
     let placedWords = [];
     let _wordInfos = shuffle([...wordInfos]);
     let firstWord = _wordInfos[0];
-    grid = placeFirstWordOnGrid(_wordInfos, grid);
 
+    grid = placeFirstWordOnGrid(_wordInfos, grid);
     moveWordToPlaced(0, _wordInfos, placedWords);
+    
     // think of some retry mechanism harcoded tries is option
     for (let i = 0; i < 10; i++) {
       createCrosswordGrid(_wordInfos, placedWords, grid);
