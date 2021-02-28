@@ -26,4 +26,29 @@ const isEmptyCell = (x, y, grid) => {
   return grid[x][y] === DEFAULT_EMPTY_CELL_VALUE;
 };
 
-export { isCellEndOfWord, doesCellExist, isCellStartOfWord, isEmptyCell };
+const checkIfCellIsNotAtLastRow = (x, grid) => {
+  return x < grid.length - 1;
+};
+
+const checkIfCellIsNotAtFirstRow = (x) => {
+  return x > 0;
+};
+
+const checkIfCellIsNotAtLastColumn = (y, grid) => {
+  return y < grid[0].length - 1;
+};
+
+const checkIfCellIsNotAtFirstColumn = (y) => {
+  return y > 0;
+};
+
+export {
+  isCellEndOfWord,
+  doesCellExist,
+  isCellStartOfWord,
+  isEmptyCell,
+  checkIfCellIsNotAtLastRow,
+  checkIfCellIsNotAtFirstRow,
+  checkIfCellIsNotAtLastColumn,
+  checkIfCellIsNotAtFirstColumn
+};

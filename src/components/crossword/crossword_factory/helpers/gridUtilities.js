@@ -18,8 +18,8 @@ const placeWordOnGrid = (wordInfo, grid) => {
   return _grid;
 };
 
-const placeFirstWordOnGrid = (wordInfos, grid) => {
-  let wordInfo = wordInfos[0];
+const placeFirstWordOnGrid = (wordsInfo, grid) => {
+  const wordInfo = wordsInfo[0];
   wordInfo.isVertical = Math.random() > 0.5 ? true : false;
   const halfOfGridSize = Math.floor(grid.length / 2);
   const quaterOfGridSize = Math.floor(grid.length / 4);
@@ -43,7 +43,6 @@ const generateGrid = (size, defaultEmptyCell) => {
 
 const tryPlacingWordOnGrid = (wordInfo, placedWords, grid) => {
   const potentialIntersectionInfos = getPotentialIntersectionsForWord(wordInfo, placedWords);
-  const { text } = wordInfo;
 
   if (potentialIntersectionInfos.length > 0) {
     for (let i = 0; i < potentialIntersectionInfos.length; i++) {
@@ -54,7 +53,7 @@ const tryPlacingWordOnGrid = (wordInfo, placedWords, grid) => {
       let x = 0;
       let y = 0;
 
-      //calculating potential start of cordinates
+      //calculating cordinates for potential start
       if (isVertical) {
         x = placedX - indexOfCrossChar;
         y = placedY;
@@ -65,27 +64,8 @@ const tryPlacingWordOnGrid = (wordInfo, placedWords, grid) => {
 
       wordInfo.startingCordinates.x = x;
       wordInfo.startingCordinates.y = y;
-      if (wordInfo.text === 'jet' && x === 4 && y === 17) debugger;
-      let isWordIllegal = false;
 
-      for (let i = 0; i < wordInfo.text.length; i++) {
-        const currentX = isVertical ? x + i : x;
-        const currentY = isVertical ? y : y + i;
-
-        const isCellLegal =
-          (doesCellExist(currentX, currentY, grid) && text[i] === grid[currentX][currentY]) ||
-          isEmptyCell(currentX, currentY, grid);
-
-        if (isCellLegal) {
-          if (checkIfCharIsIllegalForCell(currentX, currentY, wordInfo, grid)) {
-            isWordIllegal = true;
-          }
-        } else {
-          isWordIllegal = true;
-        }
-
-        if (isWordIllegal === true) break;
-      }
+      let isWordIllegal = _verifyCells(x, y, wordInfo, grid);
 
       if (isWordIllegal === false) {
         return true;
@@ -93,6 +73,29 @@ const tryPlacingWordOnGrid = (wordInfo, placedWords, grid) => {
     }
     return false;
   }
+};
+
+const _verifyCells = (x, y, wordInfo, grid) => {
+  const { isVertical, text } = wordInfo;
+
+  for (let i = 0; i < wordInfo.text.length; i++) {
+    const currentX = isVertical ? x + i : x;
+    const currentY = isVertical ? y : y + i;
+
+    const isCellLegal =
+      (doesCellExist(currentX, currentY, grid) && text[i] === grid[currentX][currentY]) ||
+      isEmptyCell(currentX, currentY, grid);
+
+    if (!isCellLegal) {
+      return true;
+    }
+
+    if (checkIfCharIsIllegalForCell(currentX, currentY, wordInfo, grid)) {
+      return true;
+    }
+  }
+
+  return false;
 };
 
 export { placeWordOnGrid, placeFirstWordOnGrid, generateGrid, tryPlacingWordOnGrid };
