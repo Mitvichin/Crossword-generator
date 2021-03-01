@@ -3,6 +3,7 @@ import { CrosswordLayout } from './crossword_layout/CrosswordLayout';
 import { CrosswordFactory } from './crossword_factory/CrosswordFactory';
 import { CrosswordInput } from './crossword_input/CrosswordInput';
 import classes from './crossword.module.css';
+const splitSymbol = ',';
 
 const Crossword = () => {
   const [grid, setGrid] = useState();
@@ -11,14 +12,18 @@ const Crossword = () => {
 
   const constGenerateCrossWord = (inputValue) => {
     setIsLoading(true);
-    const words = inputValue.toUpperCase().replace(/\s/g, '').split(',');
+    const words = inputValue
+      .toUpperCase()
+      .replace(/\s/g, '')
+      .split(splitSymbol)
+      .filter((word) => word !== '');
 
     setTimeout(() => {
       const crosswordGrid = CrosswordFactory(words);
       setGrid(crosswordGrid.grid);
       setUnusedWords(crosswordGrid.unusedWords);
       setIsLoading(false);
-    }, 100);//waiting 100 miliseconds for the ui to update
+    }, 100); //waiting 100 miliseconds for the ui to update
   };
 
   const getUnusedWordsLayout = () => {
@@ -28,7 +33,7 @@ const Crossword = () => {
         <div>
           Unused words:{' '}
           {unusedWords.map((wordInfo, i) => (
-            <span>
+            <span key={i}>
               {wordInfo.text}
               {i !== unusedWordsLength - 1 && ','}
             </span>
