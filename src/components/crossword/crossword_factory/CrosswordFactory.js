@@ -15,7 +15,9 @@ function CrosswordFactory(words) {
   let iterations = 0;
   let initialSortedWordsInfo = _createWordsInfoSortedByLengthDesc(words);
   const grids = [];
-  const initialGridSize = Math.floor(initialSortedWordsInfo[0].text.length * GRID_MIN_SIZE_MULTIPLIER); //getting the longest word and setting the grid size
+  const initialGridSize = Math.floor(
+    initialSortedWordsInfo[0].text.length * GRID_MIN_SIZE_MULTIPLIER
+  ); //getting the longest word and setting the grid size
   let placedWords = [];
   let gridSizeMultiplier = 1;
 
@@ -44,7 +46,6 @@ function CrosswordFactory(words) {
       unusedWords: [...wordsInfo]
     });
 
-    console.log(iterations);
     iterations += 1;
   }
 

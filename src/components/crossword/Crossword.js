@@ -18,7 +18,7 @@ const Crossword = () => {
       setGrid(crosswordGrid.grid);
       setUnusedWords(crosswordGrid.unusedWords);
       setIsLoading(false);
-    }, 0);
+    }, 100);//waiting 100 miliseconds for the ui to update
   };
 
   const getUnusedWordsLayout = () => {
