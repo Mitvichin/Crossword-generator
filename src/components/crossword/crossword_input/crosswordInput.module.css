@@ -1,7 +1,26 @@
-.inputContainer {
+.container {
   width: 100%;
+  display: flex;
 }
 
 .input {
   margin-right: 2rem;
+  outline: none;
+  border: none;
+  border-bottom: 1px solid black;
+}
+
+.button {
+  cursor: pointer;
+  border: 2px solid #407294;
+  font-weight: 500;
+  transition: 0.2s ease;
+  border-radius: 7px;
+  display: inline-block;
+  padding: 0.3rem 1rem 0.3rem 1rem;
+}
+
+.button:hover {
+  background-color: #407294;
+  color: white;
 }

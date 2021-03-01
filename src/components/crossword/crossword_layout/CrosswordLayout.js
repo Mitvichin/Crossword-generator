@@ -8,7 +8,7 @@ const CrosswordLayout = ({ grid }) => {
     const result = grid.map((row) =>
       row.map((item, i) => (
         <div key={i} className={classes.cellContainer}>
-          <span className={classes.cell}>{`${item.toUpperCase()}`}</span>
+          <span className={classes.cell}>{`${item}`}</span>
           {i === row.length - 1 ? <br /> : ''}
         </div>
       ))

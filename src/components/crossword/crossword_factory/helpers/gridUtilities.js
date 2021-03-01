@@ -3,7 +3,6 @@ import { doesCellExist, isEmptyCell } from './cellChecks';
 import { checkIfCharIsIllegalForCell } from './checkIfCharIsIllegalForCell';
 
 const placeWordOnGrid = (wordInfo, grid) => {
-  const _grid = [...grid];
   const rowIndex = wordInfo.startingCordinates.x;
   const columnIndex = wordInfo.startingCordinates.y;
 
@@ -15,23 +14,24 @@ const placeWordOnGrid = (wordInfo, grid) => {
     }
   }
 
-  return _grid;
+  return grid;
 };
 
 const placeFirstWordOnGrid = (wordsInfo, grid) => {
   const wordInfo = wordsInfo[0];
-  wordInfo.isVertical = Math.random() > 0.5 ? true : false;
   const halfOfGridSize = Math.floor(grid.length / 2);
-  const quaterOfGridSize = Math.floor(grid.length / 4);
+  const quaterOfGridSize = Math.floor(halfOfGridSize / 2);
+
+  wordInfo.isVertical = Math.random() > 0.5 ? true : false;
   const { isVertical } = wordInfo;
   wordInfo.startingCordinates = {
     x: isVertical ? quaterOfGridSize : halfOfGridSize,
     y: isVertical ? halfOfGridSize : quaterOfGridSize
   };
 
-  let _grid = placeWordOnGrid(wordInfo, grid);
+  grid = placeWordOnGrid(wordInfo, grid);
 
-  return _grid;
+  return grid;
 };
 
 const generateGrid = (size, defaultEmptyCell) => {
@@ -50,24 +50,20 @@ const tryPlacingWordOnGrid = (wordInfo, placedWords, grid) => {
       wordInfo.isVertical = !isPlacedWordVertical;
       const { isVertical } = wordInfo;
       const indexOfCrossChar = wordInfo.text.indexOf(char);
-      let x = 0;
-      let y = 0;
 
-      //calculating cordinates for potential start
-      if (isVertical) {
-        x = placedX - indexOfCrossChar;
-        y = placedY;
-      } else {
-        x = placedX;
-        y = placedY - indexOfCrossChar;
-      }
+      const { x, y } = _calculatePotentialStartCordinate(
+        placedX,
+        placedY,
+        isVertical,
+        indexOfCrossChar
+      );
 
       wordInfo.startingCordinates.x = x;
       wordInfo.startingCordinates.y = y;
 
-      let isWordIllegal = _verifyCells(x, y, wordInfo, grid);
+      const isWordIllegal = _checkIfWordIsIllegal(x, y, wordInfo, grid);
 
-      if (isWordIllegal === false) {
+      if (!isWordIllegal) {
         return true;
       }
     }
@@ -75,7 +71,22 @@ const tryPlacingWordOnGrid = (wordInfo, placedWords, grid) => {
   }
 };
 
-const _verifyCells = (x, y, wordInfo, grid) => {
+const _calculatePotentialStartCordinate = (placedX, placedY, isVertical, indexOfCrossChar) => {
+  let x = 0;
+  let y = 0;
+
+  if (isVertical) {
+    x = placedX - indexOfCrossChar;
+    y = placedY;
+  } else {
+    x = placedX;
+    y = placedY - indexOfCrossChar;
+  }
+
+  return { x, y };
+};
+
+const _checkIfWordIsIllegal = (x, y, wordInfo, grid) => {
   const { isVertical, text } = wordInfo;
 
   for (let i = 0; i < wordInfo.text.length; i++) {
