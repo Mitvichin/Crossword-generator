@@ -41,7 +41,7 @@ const generateGrid = (size, defaultEmptyCell) => {
   return grid;
 };
 
-const tryPlacingWordOnGrid = (wordInfo, placedWords, grid) => {
+const checkIfWordCanBePlacedOnGrid = (wordInfo, placedWords, grid) => {
   const potentialIntersectionInfos = getPotentialIntersectionsForWord(wordInfo, placedWords);
 
   if (potentialIntersectionInfos.length > 0) {
@@ -109,4 +109,4 @@ const _checkIfWordIsIllegal = (x, y, wordInfo, grid) => {
   return false;
 };
 
-export { placeWordOnGrid, placeFirstWordOnGrid, generateGrid, tryPlacingWordOnGrid };
+export { placeWordOnGrid, placeFirstWordOnGrid, generateGrid, checkIfWordCanBePlacedOnGrid};

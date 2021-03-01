@@ -1,5 +1,5 @@
 import React from 'react';
-import classes from './corsswordLayout.module.css';
+import classes from './crosswordLayout.module.css';
 import PropTypes from 'prop-types';
 
 const CrosswordLayout = ({ grid }) => {
