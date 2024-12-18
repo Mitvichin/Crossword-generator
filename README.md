@@ -1,3 +1,5 @@
+You can check it here: https://crossword-generator-brown.vercel.app/
+
 How to start the project:
 
 1. run npm install in the root directory
