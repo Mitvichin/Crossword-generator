@@ -1,0 +1,24 @@
+Using HTML5 and cutting-edge Javascript, create a web application that generates random crossword puzzles from an array of words input in a form. The generated puzzle does not have to conform to a strict rectangle. This coding exercise should be started from scratch with the following criteria met:
+ The project should be cross-browser compatible and work flawlessly in the latest versions of Chrome, Edge, and Firefox
+only React, or Vanilla (plain) JS should be used for FE development
+if needed, create an absolute beginner's guide on how to install/run the application 
+the codebase should follow clean coding guidelines for naming and using variables & functions, as well as some JavaScript specific clean coding best practices
+
+
+
+Example of acceptable output 
+    W 
+HELLO 
+    R 
+    L 
+  MADBID 
+      N 
+      TASK 
+      E  O 
+     PROGRAMMING 
+      E  E 
+      S  A 
+      T 
+      I 
+      N 
+      G 
