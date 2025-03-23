@@ -25,3 +25,13 @@
   background-color: #407294;
   color: white;
 }
+
+.disabled {
+  filter: grayscale();
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.disabled:hover {
+  cursor: not-allowed;
+}
