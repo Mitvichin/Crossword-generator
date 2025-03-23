@@ -10,6 +10,7 @@ import {
   generateGrid,
   checkIfWordCanBePlacedOnGrid
 } from './helpers/gridUtilities';
+import { trimGrid } from './helpers/trimGrid';
 
 function CrosswordFactory(words) {
   let iterations = 0;
@@ -43,7 +44,7 @@ function CrosswordFactory(words) {
     grids.push({
       grid,
       wordsCount: placedWords.length,
-      unusedWords: [...wordsInfo]
+      unusedWords: [...wordsInfo.map((it) => it.text)]
     });
 
     iterations += 1;
@@ -51,8 +52,10 @@ function CrosswordFactory(words) {
 
   const bestGrid = _selectBestGrid(_areAllWordsUsed, grids);
 
+  let trimmedGrid = trimGrid(bestGrid.grid);
+
   return {
-    grid: bestGrid.grid,
+    grid: trimmedGrid,
     unusedWords: bestGrid.unusedWords
   };
 }

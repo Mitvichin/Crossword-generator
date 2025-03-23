@@ -18,6 +18,12 @@ const Crossword = () => {
       .split(splitSymbol)
       .filter((word) => word !== '');
 
+    if (words.length === 0) {
+      alert('Please add words.');
+      setIsLoading(false);
+      return;
+    }
+
     setTimeout(() => {
       const crosswordGrid = CrosswordFactory(words);
       setGrid(crosswordGrid.grid);
@@ -30,14 +36,8 @@ const Crossword = () => {
     const unusedWordsLength = unusedWords.length;
     if (unusedWordsLength > 0) {
       return (
-        <div>
-          Unused words:{' '}
-          {unusedWords.map((wordInfo, i) => (
-            <span key={i}>
-              {wordInfo.text}
-              {i !== unusedWordsLength - 1 && ','}
-            </span>
-          ))}
+        <div style={{ maxWidth: '50%', height: '10%', overflow: 'auto', wordWrap: 'break-word' }}>
+          Unused words: <p>{unusedWords.join(', ')}</p>
         </div>
       );
     }
@@ -61,6 +61,7 @@ const Crossword = () => {
       </div>
       {getCrosswordLayout()}
       {getUnusedWordsLayout()}
+      <div className={`${classes.button} ${classes.disabled}`}>Save</div>
     </div>
   );
 };

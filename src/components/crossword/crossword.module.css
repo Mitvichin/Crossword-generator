@@ -8,7 +8,31 @@
 }
 
 .crosswordGrid {
-  width: 90%;
-  height: 80%;
+  /* width: 90%;
+  height: 80%; */
   overflow: auto;
+}
+
+.button {
+  cursor: pointer;
+  border: 2px solid #407294;
+  font-weight: 500;
+  transition: 0.2s ease;
+  border-radius: 7px;
+  display: inline-block;
+  padding: 0.3rem 1rem 0.3rem 1rem;
+}
+
+.button:hover {
+  background-color: #407294;
+  color: white;
+}
+
+.disabled {
+  filter: grayscale();
+  pointer-events: none;
+}
+
+.disabled:hover {
+  cursor: not-allowed;
 }
