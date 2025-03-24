@@ -4,6 +4,7 @@ import { CrosswordFactory } from './crossword_factory/CrosswordFactory';
 import { CrosswordInput } from './crossword_input/CrosswordInput';
 import classes from './crossword.module.css';
 import { saveGrid } from '../../services/grid';
+import { ToastContainer, Bounce, toast } from 'react-toastify';
 const splitSymbol = ',';
 const maxGridLength = 2056;
 
@@ -15,12 +16,12 @@ const Crossword = () => {
 
   const onSaveGrid = async () => {
     if (grid.length * grid[0]?.length > maxGridLength) {
-      alert('Grid exceeds 2056 length.');
+      toast.error('Grid exceeds 2056 length.');
       return;
     }
 
     if (grid[0] && grid[0].length === 0) {
-      alert('Grid is empty.');
+      toast.error('Grid is empty.');
       return;
     }
 
@@ -31,12 +32,13 @@ const Crossword = () => {
 
     try {
       await saveGrid(grid, usedWords);
+      toast.success('Saved grid successfully!');
     } catch (error) {
-      alert(error);
+      toast.error('Saving grid failed!');
     }
   };
 
-  const generateCrossWord = (inputValue) => {
+  const generateCrossWord = async (inputValue) => {
     setIsLoading(true);
     const words = inputValue
       .toUpperCase()
@@ -64,7 +66,7 @@ const Crossword = () => {
     const unusedWordsLength = unusedWords.length;
     if (unusedWordsLength > 0) {
       return (
-        <div style={{ maxWidth: '50%', height: '10%', overflow: 'auto', wordWrap: 'break-word' }}>
+        <div className={classes.unusedWords}>
           Unused words: <p>{unusedWords.join(', ')}</p>
         </div>
       );
@@ -84,17 +86,28 @@ const Crossword = () => {
 
   return (
     <div className={classes.container}>
-      <div>
-        <CrosswordInput onSubmitHandler={generateCrossWord} />
-      </div>
+      <CrosswordInput onSubmitHandler={generateCrossWord} />
       {getCrosswordLayout()}
       {getUnusedWordsLayout()}
-      <div
-        className={`${classes.button} ${grid === undefined ? classes.disabled : ''}`}
-        onClick={onSaveGrid}
-      >
-        Save
-      </div>
+      {grid && (
+        <div className={classes.button} onClick={onSaveGrid}>
+          Save
+        </div>
+      )}
+      <ToastContainer
+        position="bottom-right"
+        toastStyl
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
     </div>
   );
 };
