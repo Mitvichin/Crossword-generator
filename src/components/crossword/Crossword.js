@@ -47,7 +47,7 @@ const Crossword = () => {
       .filter((word) => word !== '');
 
     if (words.length === 0) {
-      alert('Please add words.');
+      toast.success('Saved grid successfully!');
       setIsLoading(false);
       return;
     }
@@ -96,7 +96,6 @@ const Crossword = () => {
       )}
       <ToastContainer
         position="bottom-right"
-        toastStyl
         autoClose={2000}
         hideProgressBar={false}
         newestOnTop={false}
