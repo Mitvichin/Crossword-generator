@@ -3,14 +3,40 @@ import { CrosswordLayout } from './crossword_layout/CrosswordLayout';
 import { CrosswordFactory } from './crossword_factory/CrosswordFactory';
 import { CrosswordInput } from './crossword_input/CrosswordInput';
 import classes from './crossword.module.css';
+import { saveGrid } from '../../services/grid';
 const splitSymbol = ',';
+const maxGridLength = 2056;
 
 const Crossword = () => {
+  const [sourceWords, setSourceWords] = useState([]);
   const [grid, setGrid] = useState();
   const [unusedWords, setUnusedWords] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const constGenerateCrossWord = (inputValue) => {
+  const onSaveGrid = async () => {
+    if (grid.length * grid[0]?.length > maxGridLength) {
+      alert('Grid exceeds 2056 length.');
+      return;
+    }
+
+    if (grid[0] && grid[0].length === 0) {
+      alert('Grid is empty.');
+      return;
+    }
+
+    let usedWords =
+      unusedWords.length !== 0
+        ? sourceWords.filter((it) => !unusedWords.includes(it))
+        : sourceWords;
+
+    try {
+      await saveGrid(grid, usedWords);
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  const generateCrossWord = (inputValue) => {
     setIsLoading(true);
     const words = inputValue
       .toUpperCase()
@@ -23,6 +49,8 @@ const Crossword = () => {
       setIsLoading(false);
       return;
     }
+
+    setSourceWords(words);
 
     setTimeout(() => {
       const crosswordGrid = CrosswordFactory(words);
@@ -57,11 +85,16 @@ const Crossword = () => {
   return (
     <div className={classes.container}>
       <div>
-        <CrosswordInput onSubmitHandler={constGenerateCrossWord} />
+        <CrosswordInput onSubmitHandler={generateCrossWord} />
       </div>
       {getCrosswordLayout()}
       {getUnusedWordsLayout()}
-      <div className={`${classes.button} ${classes.disabled}`}>Save</div>
+      <div
+        className={`${classes.button} ${grid === undefined ? classes.disabled : ''}`}
+        onClick={onSaveGrid}
+      >
+        Save
+      </div>
     </div>
   );
 };
