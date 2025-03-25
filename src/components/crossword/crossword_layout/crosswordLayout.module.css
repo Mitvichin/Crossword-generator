@@ -1,6 +1,4 @@
 .container {
-  width: 100%;
-  height: 100%;
   white-space: nowrap;
   border: 3px black dotted;
   border-radius: 3px;

@@ -34,7 +34,7 @@ const Crossword = () => {
       await saveGrid(grid, usedWords);
       toast.success('Saved grid successfully!');
     } catch (error) {
-      toast.error('Saving grid failed!');
+      toast.error(error.message);
     }
   };
 
