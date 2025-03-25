@@ -9,6 +9,8 @@ export const saveGrid = async (grid, words) => {
     if (res.ok) {
       return res.json();
     }
-    throw new Error((await res.json()).grid);
+
+    let data = await res.json();
+    throw new Error(data.message);
   });
 };
