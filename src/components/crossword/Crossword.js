@@ -5,6 +5,7 @@ import { CrosswordInput } from './crossword_input/CrosswordInput';
 import classes from './crossword.module.css';
 import { saveGrid } from '../../services/grid';
 import { ToastContainer, Bounce, toast } from 'react-toastify';
+import { AppError } from '../../utils/errors';
 const splitSymbol = ',';
 const maxGridLength = 2056;
 
@@ -34,7 +35,12 @@ const Crossword = () => {
       await saveGrid(grid, usedWords);
       toast.success('Saved grid successfully!');
     } catch (error) {
-      toast.error(error.message);
+      if (error instanceof AppError) {
+        toast.error(error.message);
+        return;
+      }
+
+      toast.error('Something went wrong! Please, try again later!');
     }
   };
 
